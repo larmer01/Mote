@@ -53,9 +53,10 @@ Graphing is supported by JFreeChart: http://www.jfree.org/
 
 References
 ----------
-Some statistical functions (notably the PDF and CDF for various distributions)
-were ported from SciPy: http://scipy.org
-Some math functions were ported from the CEPHES library: http://www.netlib.org/cephes/
+* Some statistical functions (notably the PDF and CDF for various
+  distributions) were ported from SciPy: http://scipy.org
+* Some math functions were ported from the CEPHES library:
+  http://www.netlib.org/cephes/
 
 Known Issues
 ------------
