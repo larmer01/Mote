@@ -29,3 +29,7 @@ ehthumbs.db
 Icon?
 Thumbs.db
 *.swp
+
+# Project-specific
+build/*
+dist/*
