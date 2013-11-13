@@ -4,23 +4,23 @@ MOTE - Measure of the Effect
 Overview
 --------
 Mote is an effect size program that calculates various effect sizes and their
-confidence intervals organized by test statistic for ease of use for everyone
-from students to established researchers.
+confidence intervals. It's designed to be easy to use for everyone from
+students to established researchers.
 
 The program calculates the following measures based on the normal and
 non-central t distributions. These have been tested, but are still considered
 beta quality:
 * Cohen’s d
-..* Z
-..* Single Sample t
-..* Dependent t (Averages)
-..* Dependent t (SD Diff)
-..* Independent t
-..* Pearson’s r
+  * Z
+  * Single Sample t
+  * Dependent t (Averages)
+  * Dependent t (SD Diff)
+  * Independent t
+  * Pearson’s r
 * Hedges’s g
-..* Independent t
+  * Independent t
 * Glass’s Delta
-..* Independent t
+  * Independent t
 
 The following 1-way ANOVA tests based on the non-central F distribution are
 currently under development and should be considered alpha quality work:
