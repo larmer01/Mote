@@ -23,8 +23,9 @@
 *.sqlite
 *.db
 
-# OS generated files
+# Generated files
 .DS_Store*
 ehthumbs.db
 Icon?
 Thumbs.db
+*.swp
