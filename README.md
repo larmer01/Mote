@@ -10,30 +10,30 @@ from students to established researchers.
 The program calculates the following measures based on the normal and
 non-central t distributions. These have been tested, but are still considered
 beta quality:
-    * Cohen’s d
-    ..* Z
-    ..* Single Sample t
-    ..* Dependent t (Averages)
-    ..* Dependent t (SD Diff)
-    ..* Independent t
-    ..* Pearson’s r
-    * Hedges’s g
-    ..* Independent t
-    * Glass’s Delta
-    ..* Independent t
+* Cohen’s d
+..* Z
+..* Single Sample t
+..* Dependent t (Averages)
+..* Dependent t (SD Diff)
+..* Independent t
+..* Pearson’s r
+* Hedges’s g
+..* Independent t
+* Glass’s Delta
+..* Independent t
 
 The following 1-way ANOVA tests based on the non-central F distribution are
 currently under development and should be considered alpha quality work:
-    * R-squared
-    * Delta R-squared
-    * Eta-squared
-    * Partial eta-squared
-    * Omega-squared
-    * Partial omega-squared
-    * Intraclass correlation
+* R-squared
+* Delta R-squared
+* Eta-squared
+* Partial eta-squared
+* Omega-squared
+* Partial omega-squared
+* Intraclass correlation
 
 Additionally, confidence intervals can be found for:
-    * Odds ratio
+* Odds ratio
 
 Installation
 ------------
@@ -49,16 +49,16 @@ The full user’s guide is available via the _Help --> Users’s Guide_ menu.
 
 Known Issues
 ------------
-    * Large sample sizes can cause the PDF for t distributions to flatten out
-      making the graph un-viewable. The numeric values are still correct.
-    * Validation is still underway for the ANOVA tests and the results should
-      be considered alpha quality.
-    * When using the mouse to select cells for entry, the cursor can sometimes
-      become “stuck” and Mote will be unresponsive to key presses. Clicking on
-      the “Name” header will free the cursor.
+* Large sample sizes can cause the PDF for t distributions to flatten out
+  making the graph un-viewable. The numeric values are still correct.
+* Validation is still underway for the ANOVA tests and the results should be
+  considered alpha quality.
+* When using the mouse to select cells for entry, the cursor can sometimes
+  become “stuck” and Mote will be unresponsive to key presses. Clicking on the
+  _Name_ header will free the cursor.
 
 Contact
 -------
 Website: http://aggieerin.com/mote/
-E-mail: Tim Larmer (larmer01@gmail.com)
-        Erin Bunchanan (erinbuchanan@missouristate.edu)
+
+E-mail: Tim Larmer (larmer01@gmail.com) or Erin Bunchanan (erinbuchanan@missouristate.edu)
