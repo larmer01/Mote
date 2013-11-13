@@ -47,6 +47,16 @@ runtime installed, you can download one from Oracle:
 
 The full user’s guide is available via the _Help --> Users’s Guide_ menu.
 
+Dependencies
+------------
+Graphing is supported by JFreeChart: http://www.jfree.org/
+
+References
+----------
+Some statistical functions (notably the PDF and CDF for various distributions)
+were ported from SciPy: http://scipy.org
+Some math functions were ported from the CEPHES library: http://www.netlib.org/cephes/
+
 Known Issues
 ------------
 * Large sample sizes can cause the PDF for t distributions to flatten out
