@@ -1,8 +1,8 @@
 package edu.missouristate.mote.propertygrid;
 
-import edu.missouristate.mote.Utilities;
 import java.awt.Component;
 import java.awt.Font;
+import java.text.DecimalFormat;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -52,7 +52,9 @@ public class PropertyCellRenderer extends DefaultTableCellRenderer {
         if (column == 1 && !tableRow.isCategory()) {
             try {
                 final double newDouble = Double.parseDouble(value.toString());
-                newValue = Utilities.round(newDouble);
+                final DecimalFormat format = new DecimalFormat(
+                        Constants.DECIMAL_FORMAT);
+                newValue = format.format(newDouble);
             } catch (ClassCastException e) {
                 newValue = value;
             } catch (NumberFormatException e) {

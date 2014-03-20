@@ -12,7 +12,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellEditor;
-import edu.missouristate.mote.Utilities;
+import edu.missouristate.mote.Constants;
 
 /**
  * Editor for cells in a PropertyTable.
@@ -46,7 +46,7 @@ public class PropertyCellEditor extends AbstractCellEditor
         this.tableRows = tableRows;
         textField = new JFormattedTextField();
         // The default border makes it almost impossible to edit
-        textField.setBorder(new EmptyBorder(new Insets(1, 0, 1, 0)));
+        textField.setBorder(new EmptyBorder(new Insets(1, 5, 1, 1)));
         // This handles getting us out of editing using tab or enter if we
         // used the mouse to double click and edit the cell
         textField.addKeyListener(new KeyAdapter() {
@@ -136,11 +136,9 @@ public class PropertyCellEditor extends AbstractCellEditor
             newIsValid = false;
         }
         try {
-            // Get the old value
             final double oldValue = (Double) getter.invoke(selectedObject);
-            // Update the underlying object if the values are different and if
-            // the new value is a valid number
-            if (newIsValid && !Utilities.areEqual(oldValue, newValue)) {
+            // Update the underlying object if the new value is a valid number
+            if (newIsValid && Math.abs(newValue - oldValue) > Constants.PRECISION) {
                 setter.invoke(selectedObject, newValue);
             }
             // It's possible the object has some restrictions on values and

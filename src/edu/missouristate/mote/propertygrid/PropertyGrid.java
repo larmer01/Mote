@@ -11,6 +11,7 @@ import javax.swing.event.ListSelectionListener;
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
 import edu.missouristate.mote.events.ChangeNotifier;
+import edu.missouristate.mote.Constants;
 
 /**
  *
@@ -22,11 +23,11 @@ public class PropertyGrid extends JPanel {
     // FIELDS
     // *************************************************************************
     // TextArea holding the help text
-    private JTextArea help = new JTextArea();
+    private final JTextArea help = new JTextArea();
     // ScrollPanel holding the help TextArea
-    private JScrollPane helpScrollPane = new JScrollPane();
+    private final JScrollPane helpScrollPane = new JScrollPane();
     // Table holding the properties
-    private PropertyTable table = new PropertyTable();
+    private final PropertyTable table = new PropertyTable();
     // ScrollPane holding the properties Table
     private final JScrollPane tableScrollPane = new JScrollPane();
 
@@ -51,7 +52,7 @@ public class PropertyGrid extends JPanel {
      */
     private void initHelp() {
         help.setEditable(false);
-        help.setBackground(new Color(238, 238, 238));
+        help.setBackground(Constants.NAME_BG_COLOR);
         help.setColumns(20);
         help.setLineWrap(true);
         help.setRows(5);
