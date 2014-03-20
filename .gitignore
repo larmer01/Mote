@@ -31,5 +31,7 @@ Thumbs.db
 *.swp
 
 # Project-specific
+.jacocoverage/*
 build/*
 dist/*
+nbproject/*

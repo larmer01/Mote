@@ -72,4 +72,4 @@ Contact
 -------
 Website: http://aggieerin.com/mote/
 
-E-mail: Tim Larmer (larmer01@gmail.com) or Erin Bunchanan (erinbuchanan@missouristate.edu)
+E-mail: Tim Larmer (larmer01@gmail.com) or Erin Buchanan (erinbuchanan@missouristate.edu)
