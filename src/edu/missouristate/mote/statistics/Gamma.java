@@ -15,11 +15,11 @@ public final class Gamma {
     private static final double LOG_PI = 1.14472988584940017414;
     private static final double LOG_SQRT_2PI = 0.91893853320467274178;
     private static final double MAX_LOG_GAMMA = 2.556348e305;
-    private static final double P_COEFFS[] = {1.60119522476751861407E-4,
+    private static final double[] P_COEFFS = {1.60119522476751861407E-4,
         1.19135147006586384913E-3, 1.04213797561761569935E-2,
         4.76367800457137231464E-2, 2.07448227648435975150E-1,
         4.94214826801497100753E-1, 9.99999999999999996796E-1};
-    private static final double Q_COEFFS[] = {-2.31581873324120129819E-5,
+    private static final double[] Q_COEFFS = {-2.31581873324120129819E-5,
         5.39605580493303397842E-4, -4.45641913851797240494E-3,
         1.18139785222060435552E-2, 3.58236398605498653373E-2,
         -2.34591795718243348568E-1, 7.14304917030273074085E-2,
@@ -34,18 +34,18 @@ public final class Gamma {
         3.47222221605458667310E-3, 8.33333333333482257126E-2,};
     private static final double MAX_STIRLING = 143.01608;
     // Polynomial coefficients for Stirling's formula for log Gamma
-    private static final double A_COEFFS[] = {8.11614167470508450300E-4,
+    private static final double[] A_COEFFS = {8.11614167470508450300E-4,
         -5.95061904284301438324E-4, 7.93650340457716943945E-4,
         -2.77777777730099687205E-3, 8.33333333333331927722E-2
     };
     // Polynomial coefficients for Stirling's formula for log Gamma (2...3)
-    private static final double B_COEFFS[] = {-1.37825152569120859100E3,
+    private static final double[] B_COEFFS = {-1.37825152569120859100E3,
         -3.88016315134637840924E4, -3.31612992738871184744E5,
         -1.16237097492762307383E6, -1.72173700820839662146E6,
         -8.53555664245765465627E5
     };
     // Polynomial coefficients for Stirling's formula for log Gamma (2...3)
-    private static final double C_COEFFS[] = {-3.51815701436523470549E2,
+    private static final double[] C_COEFFS = {-3.51815701436523470549E2,
         -1.70642106651881159223E4, -2.20528590553854454839E5,
         -1.13933444367982507207E6, -2.53252307177582951285E6,
         -2.01889141433532773231E6
