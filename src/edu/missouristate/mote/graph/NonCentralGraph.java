@@ -8,25 +8,29 @@ import org.jfree.ui.TextAnchor;
 import edu.missouristate.mote.effectsizes.AbstractNonCentralTest;
 
 /**
- *
- * @author tim
+ * Graphing support for tests based on a non-central distribution.
  */
 public class NonCentralGraph extends AbstractGraph {
 
     // *************************************************************************
     // FIELDS
     // *************************************************************************
-    private transient final AbstractNonCentralTest test;
+
+    /** Statistical test represented by this graph. */
+    private final transient AbstractNonCentralTest currentTest;
 
     // *************************************************************************
     // CONSTRUCTORS
     // *************************************************************************
+
     /**
      * Initialize a new instance of a NonCentralGraph.
+     *
+     * @param test statistical test
      */
     public NonCentralGraph(final AbstractNonCentralTest test) {
         super(test);
-        this.test = test;
+        currentTest = test;
         setXAxisLabel(test.getTestStatisticSymbol());
         setYAxisLabel("density");
         refresh();
@@ -35,62 +39,65 @@ public class NonCentralGraph extends AbstractGraph {
     // *************************************************************************
     // PRIVATE METHODS
     // *************************************************************************
+
+    /**
+     * Update the chart based on the current statistical test.
+     */
     private void updateChart() {
         // Lower and upper PDF curves
         final DefaultXYDataset dataset = new DefaultXYDataset();
-        dataset.addSeries(0, test.getLowerPdf());
-        dataset.addSeries(1, test.getUpperPdf());
+        dataset.addSeries(0, currentTest.getLowerPdf());
+        dataset.addSeries(1, currentTest.getUpperPdf());
         setDataset(dataset);
         // Confidence interval x/y values
-        final double x1 = test.getLowerNc();
-        //final double y1a = findApproxYValue(x1, test.getLowerPdf());
-        final double x2 = test.getTestStatistic();
-        //final double y2 = Math.max(findApproxYValue(x2, test.getLowerPdf()),
-        //        findApproxYValue(x2, test.getUpperPdf()));
-        final double y1 = Math.max(findMaxYValue(test.getLowerPdf()),
-                findMaxYValue(test.getUpperPdf()));
-        final double x3 = test.getUpperNc();
-        //final double y3a = findApproxYValue(x3, test.getUpperPdf());
-        //final double y1 = Math.max(y1a, 0.3 * Math.max(y1a, y3a));
-        //final double y3 = Math.max(y3a, 0.3 * Math.max(y1a, y3a));
-        final double y2 = y1 * 0.2;
-        final double y3 = y1;
-        final double yh = Math.min(y1, y3) * 0.8;
+        final double xLeft = currentTest.getLowerNc();
+        final double xMiddle = currentTest.getTestStatistic();
+        final double xRight = currentTest.getUpperNc();
+        final double yTop = Math.max(findMaxYValue(currentTest.getLowerPdf()),
+                findMaxYValue(currentTest.getUpperPdf()));
+        final double yBar = yTop * 0.8;
+        final double yMetric = yTop * 0.2;
         // Confidence interval vertical line annotations
         removeAnnotations();
-        addAnnotation(new XYLineAnnotation(x1, 0.0, x1, y1));
-        addAnnotation(new XYLineAnnotation(x2, 0.0, x2, y2));
-        addAnnotation(new XYLineAnnotation(x3, 0.0, x3, y3));
+        addAnnotation(new XYLineAnnotation(xLeft, 0.0, xLeft, yTop));
+        addAnnotation(new XYLineAnnotation(xMiddle, 0.0, xMiddle, yMetric));
+        addAnnotation(new XYLineAnnotation(xRight, 0.0, xRight, yTop));
         // Confidence interval horizontal line annotation
-        addAnnotation(new XYLineAnnotation(x1, yh, x3, yh));
-        final XYPointerAnnotation leftArrow = new XYPointerAnnotation("", x1, yh, 0.0);
+        addAnnotation(new XYLineAnnotation(xLeft, yBar, xRight, yBar));
+        final XYPointerAnnotation leftArrow = new XYPointerAnnotation("", xLeft,
+                yBar, 0.0);
         leftArrow.setTipRadius(0.0);
         addAnnotation(leftArrow);
-        final XYPointerAnnotation rightArrow = new XYPointerAnnotation("", x3, yh, Math.PI);
+        final XYPointerAnnotation rightArrow = new XYPointerAnnotation("",
+                xRight, yBar, Math.PI);
         rightArrow.setTipRadius(0.0);
         addAnnotation(rightArrow);
-        // Lower D text annotation
-        final String lowerDStr = String.format(test.getMeasureSymbol()
-                + "=%.4f", test.getLowerMeasure());
-        final XYTextAnnotation lowerDAnn = new XYTextAnnotation(lowerDStr, x1, y1);
-        lowerDAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
-        addAnnotation(lowerDAnn);
-        // Cohen's D text annotation
-        final String cohensDStr = String.format(test.getMeasureSymbol()
-                + "=%.4f", test.getMeasure());
-        final XYTextAnnotation cohensDAnn = new XYTextAnnotation(cohensDStr, x2, y2);
-        cohensDAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
-        addAnnotation(cohensDAnn);
-        // Upper D text annotation
-        final String upperDStr = String.format(test.getMeasureSymbol()
-                + "=%.4f", test.getUpperMeasure());
-        final XYTextAnnotation upperDAnn = new XYTextAnnotation(upperDStr, x3, y3);
-        upperDAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
-        addAnnotation(upperDAnn);
+        // Left metric text annotation
+        final String leftMetric = String.format(currentTest.getMeasureSymbol()
+                + "=%.4f", currentTest.getLowerMeasure());
+        final XYTextAnnotation leftMetricAnn = new XYTextAnnotation(leftMetric,
+                xLeft, yTop);
+        leftMetricAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
+        addAnnotation(leftMetricAnn);
+        // Actual metric text annotation
+        final String actMetric = String.format(currentTest.getMeasureSymbol()
+                + "=%.4f", currentTest.getMeasure());
+        final XYTextAnnotation actMetricAnn = new XYTextAnnotation(actMetric,
+                xMiddle, yMetric);
+        actMetricAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
+        addAnnotation(actMetricAnn);
+        // Right metric text annotation
+        final String rightMetric = String.format(currentTest.getMeasureSymbol()
+                + "=%.4f", currentTest.getUpperMeasure());
+        final XYTextAnnotation rightMetricAnn = new XYTextAnnotation(
+                rightMetric, xRight, yTop);
+        rightMetricAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
+        addAnnotation(rightMetricAnn);
         // CI text annotation
-        final int confidence = (int) (test.getConfidence() * 100);
+        final int confidence = (int) (currentTest.getConfidence() * 100);
         final String confStr = confidence + "% confidence";
-        final XYTextAnnotation confAnn = new XYTextAnnotation(confStr, (x1 + x3) * 0.5, yh);
+        final XYTextAnnotation confAnn = new XYTextAnnotation(confStr,
+                (xLeft + xRight) * 0.5, yBar);
         confAnn.setTextAnchor(TextAnchor.BOTTOM_CENTER);
         addAnnotation(confAnn);
     }
@@ -98,10 +105,14 @@ public class NonCentralGraph extends AbstractGraph {
     // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
+
+    /**
+     * Refresh this NonCentralGraph.
+     */
     @Override
     public final void refresh() {
-        setTitle(test);
-        if (test.getLowerPdf() != null) {
+        setTitle(currentTest);
+        if (currentTest.getLowerPdf() != null) {
             updateChart();
         }
     }

@@ -6,23 +6,33 @@ import edu.missouristate.mote.effectsizes.AbstractNonCentralTest;
 import edu.missouristate.mote.effectsizes.AbstractNormalTest;
 
 /**
- *
- * @author tim
+ * Panel encapsulating an AbstractGraph.
  */
-public class GraphPanel extends JPanel {
+public final class GraphPanel extends JPanel {
 
     // *************************************************************************
     // FIELDS
     // *************************************************************************
+
+    /** Graph object. */
     private transient AbstractGraph currentGraph;
 
     // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
+
+    /**
+     * Refresh the underlying graph.
+     */
     public void refresh() {
         currentGraph.refresh();
     }
 
+    /**
+     * Update the underlying graph to show the specified statistical test.
+     *
+     * @param test statistical test
+     */
     public void update(final AbstractNonCentralTest test) {
         currentGraph = new NonCentralGraph(test);
         this.removeAll();
@@ -31,6 +41,11 @@ public class GraphPanel extends JPanel {
         this.validate();
     }
 
+    /**
+     * Update the underlying graph to show the specified statistical test.
+     *
+     * @param test statistical test
+     */
     public void update(final AbstractNormalTest test) {
         currentGraph = new NormalGraph(test);
         this.removeAll();

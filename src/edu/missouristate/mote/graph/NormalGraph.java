@@ -8,25 +8,36 @@ import org.jfree.ui.TextAnchor;
 import edu.missouristate.mote.effectsizes.AbstractNormalTest;
 
 /**
- *
- * @author tim
+ * Graphing support for tests based on the normal distribution.
  */
 public class NormalGraph extends AbstractGraph {
 
     // *************************************************************************
+    // CONSTANTS
+    // *************************************************************************
+
+    /** Alpha value that will cause us to re-anchor the label text to fit. */
+    private static final double MIN_ALPHA = 0.03;
+
+    // *************************************************************************
     // FIELDS
     // *************************************************************************
-    private transient final AbstractNormalTest test;
+
+    /** Statistical test represented by this graph. */
+    private final transient AbstractNormalTest currentTest;
+
     // *************************************************************************
     // CONSTRUCTORS
     // *************************************************************************
 
     /**
      * Initialize a new instance of a GraphPanel.
+     *
+     * @param test statistical test
      */
     public NormalGraph(final AbstractNormalTest test) {
         super(test);
-        this.test = test;
+        currentTest = test;
         setXAxisLabel(test.getTestStatisticSymbol());
         setYAxisLabel("density");
         refresh();
@@ -35,51 +46,59 @@ public class NormalGraph extends AbstractGraph {
     // *************************************************************************
     // PRIVATE METHODS
     // *************************************************************************
+
+    /**
+     * Update the chart based on the current statistical test.
+     */
     private void updateChart() {
         // Lower and upper PDF curves
         final DefaultXYDataset dataset = new DefaultXYDataset();
-        dataset.addSeries(0, test.getPdf());
+        dataset.addSeries(0, currentTest.getPdf());
         setDataset(dataset);
         // Confidence interval x/y values
-        final double x1 = -test.getDeviations();
-        final double pdfHeight = findMaxYValue(test.getPdf());
-        final double pdfCurrent = findApproxYValue(x1, test.getPdf());
-        final double y1 = Math.max(pdfCurrent, pdfHeight * 0.5);
-        final double x2 = test.getDeviations();
-        final double y2 = y1;
-        final double yh = y2 * 0.8;
+        final double xLeft = -currentTest.getDeviations();
+        final double xRight = currentTest.getDeviations();
+        final double pdfHeight = findMaxYValue(currentTest.getPdf());
+        final double pdfCurrent = findApproxYValue(xLeft, currentTest.getPdf());
+        final double yTop = Math.max(pdfCurrent, pdfHeight * 0.5);
+        final double yBar = yTop * 0.8;
         // Confidence interval vertical line annotations
         removeAnnotations();
-        addAnnotation(new XYLineAnnotation(x1, 0.0, x1, y1));
-        addAnnotation(new XYLineAnnotation(x2, 0.0, x2, y2));
+        addAnnotation(new XYLineAnnotation(xLeft, 0.0, xLeft, yTop));
+        addAnnotation(new XYLineAnnotation(xRight, 0.0, xRight, yTop));
         // Confidence interval horizontal line annotation
-        addAnnotation(new XYLineAnnotation(x1, yh, x2, yh));
-        final XYPointerAnnotation leftArrow = new XYPointerAnnotation("", x1, yh, 0.0);
+        addAnnotation(new XYLineAnnotation(xLeft, yBar, xRight, yBar));
+        final XYPointerAnnotation leftArrow = new XYPointerAnnotation("", xLeft,
+                yBar, 0.0);
         leftArrow.setTipRadius(0.0);
         addAnnotation(leftArrow);
-        final XYPointerAnnotation rightArrow = new XYPointerAnnotation("", x2, yh, Math.PI);
+        final XYPointerAnnotation rightArrow = new XYPointerAnnotation("",
+                xRight, yBar, Math.PI);
         rightArrow.setTipRadius(0.0);
         addAnnotation(rightArrow);
-        // Lower D text annotation
-        final String lowerDStr = String.format(test.getMeasureSymbol()
-                + "=%.4f", test.getLowerMeasure());
-        final XYTextAnnotation lowerDAnn = new XYTextAnnotation(lowerDStr, x1, y1);
-        lowerDAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
-        addAnnotation(lowerDAnn);
-        // Upper D text annotation
-        final String upperDStr = String.format(test.getMeasureSymbol()
-                + "=%.4f", test.getUpperMeasure());
-        final XYTextAnnotation upperDAnn = new XYTextAnnotation(upperDStr, x2, y2);
-        if (test.getAlpha() < 0.03) {
-            upperDAnn.setTextAnchor(TextAnchor.BOTTOM_RIGHT);
+        // Left metric text annotation
+        final String leftMetric = String.format(currentTest.getMeasureSymbol()
+                + "=%.4f", currentTest.getLowerMeasure());
+        final XYTextAnnotation leftMetricAnn = new XYTextAnnotation(leftMetric,
+                xLeft, yTop);
+        leftMetricAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
+        addAnnotation(leftMetricAnn);
+        // Right metric text annotation
+        final String rightMetric = String.format(currentTest.getMeasureSymbol()
+                + "=%.4f", currentTest.getUpperMeasure());
+        final XYTextAnnotation rightMetricAnn = new XYTextAnnotation(
+                rightMetric, xRight, yTop);
+        if (currentTest.getAlpha() < MIN_ALPHA) {
+            rightMetricAnn.setTextAnchor(TextAnchor.BOTTOM_RIGHT);
         } else {
-            upperDAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
+            rightMetricAnn.setTextAnchor(TextAnchor.BOTTOM_LEFT);
         }
-        addAnnotation(upperDAnn);
+        addAnnotation(rightMetricAnn);
         // CI text annotation
-        final int confidence = (int) ((1 - test.getAlpha()) * 100);
+        final int confidence = (int) ((1 - currentTest.getAlpha()) * 100);
         final String confStr = confidence + "% confidence";
-        final XYTextAnnotation confAnn = new XYTextAnnotation(confStr, (x1 + x2) * 0.5, yh);
+        final XYTextAnnotation confAnn = new XYTextAnnotation(confStr,
+                (xLeft + xRight) * 0.5, yBar);
         confAnn.setTextAnchor(TextAnchor.BOTTOM_CENTER);
         addAnnotation(confAnn);
     }
@@ -87,10 +106,14 @@ public class NormalGraph extends AbstractGraph {
     // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
+
+    /**
+     * Refresh this NormalGraph.
+     */
     @Override
     public final void refresh() {
-        setTitle(test);
-        if (test.getPdf() != null) {
+        setTitle(currentTest);
+        if (currentTest.getPdf() != null) {
             updateChart();
         }
     }

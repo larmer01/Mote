@@ -7,39 +7,44 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.AbstractXYAnnotation;
-import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.DefaultXYDataset;
-import org.jfree.ui.TextAnchor;
 import edu.missouristate.mote.Constants;
 import edu.missouristate.mote.events.ChangeListener;
 import edu.missouristate.mote.effectsizes.AbstractTest;
 
 /**
- *
- * @author tim
+ * Base class for implementing charts for statistical tests.
  */
 public abstract class AbstractGraph {
 
     // *************************************************************************
     // FIELDS
     // *************************************************************************
-    // We must keep references to the objects in order to remove them from the
-    // chart
-    private transient final List<AbstractXYAnnotation> annotations;
-    // The chart
-    private transient final JFreeChart chart;
-    // Panel holding the chart
-    private transient final ChartPanel chartPanel;
+
+    /**
+     * Annotation references. We must keep these in order to remove them from
+     * the chart.
+     */
+    private final transient List<AbstractXYAnnotation> annotations;
+
+    /** The chart. */
+    private final transient JFreeChart chart;
+
+    /** Panel holding the chart. */
+    private final transient ChartPanel chartPanel;
 
     // *************************************************************************
     // CONSTRUCTORS
     // *************************************************************************
+
     /**
      * Initialize a new instance of an AbstractGraph.
+     *
+     * @param test statistical test to display on this graph
      */
     public AbstractGraph(final AbstractTest test) {
-        annotations = new ArrayList<AbstractXYAnnotation>();
+        annotations = new ArrayList<>();
         // Create a default empty chart
         chart = ChartFactory.createXYLineChart("Title", "x axis", "y axis",
                 new DefaultXYDataset());
@@ -47,14 +52,15 @@ public abstract class AbstractGraph {
         // Some settings
         chart.setBackgroundPaint(Color.white);
         chart.getXYPlot().setBackgroundPaint(Color.white);
-        chart.getXYPlot().setDomainGridlinePaint(new Color(0.6f, 0.6f, 0.6f));
-        chart.getXYPlot().setRangeGridlinePaint(new Color(0.6f, 0.6f, 0.6f));
+        chart.getXYPlot().setDomainGridlinePaint(Constants.GRAPH_GRID_COLOR);
+        chart.getXYPlot().setRangeGridlinePaint(Constants.GRAPH_GRID_COLOR);
         chart.getTitle().setFont(Constants.CHART_FONT);
         chart.getXYPlot().getDomainAxis().setLabelFont(Constants.CHART_FONT);
         chart.getXYPlot().getRangeAxis().setLabelFont(Constants.CHART_FONT);
         chart.removeLegend();
         // Listen to change events on the underlying object
         test.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged() {
                 refresh();
             }
@@ -64,7 +70,15 @@ public abstract class AbstractGraph {
     // *************************************************************************
     // PROTECTED STATIC METHODS
     // *************************************************************************
-    
+
+    /**
+     * Return the closest discrete Y value in the dataset for the specified X
+     * value.
+     *
+     * @param xValue X value
+     * @param xydata array of X/Y data
+     * @return closest Y value corresponding to X value
+     */
     protected static double findApproxYValue(final double xValue,
             final double[][] xydata) {
         // Lower than the smallest x value
@@ -85,7 +99,13 @@ public abstract class AbstractGraph {
         // Something went wrong
         return 0.0;
     }
-    
+
+    /**
+     * Return the maximum Y value in the specified dataset.
+     *
+     * @param xydata array of X/Y data
+     * @return maximum Y value
+     */
     protected static double findMaxYValue(final double[][] xydata) {
         double result = xydata[1][0];
         for (int index = 1; index < xydata[1].length; index++) {
@@ -100,29 +120,40 @@ public abstract class AbstractGraph {
     // PROTECTED METHODS
     // *************************************************************************
     /**
-     * Add annotations from this.annotations to the chart.
+     * Add an annotation to the chart.
+     *
+     * @param annotation annotation to add
      */
-    protected void addAnnotation(final AbstractXYAnnotation annotation) {
+    protected final void addAnnotation(final AbstractXYAnnotation annotation) {
         annotations.add(annotation);
         chart.getXYPlot().addAnnotation(annotation);
     }
-    
+
     /**
-     * Remove annotations from this.annotations from the chart and clear
-     * this.annotations.
+     * Remove all annotations from the chart.
      */
-    protected void removeAnnotations() {
+    protected final void removeAnnotations() {
         for (AbstractXYAnnotation ann : annotations) {
             chart.getXYPlot().removeAnnotation(ann);
         }
         annotations.clear();
     }
 
-    protected void setDataset(final DefaultXYDataset dataset) {
+    /**
+     * Set the chart's dataset to the specified dataset.
+     *
+     * @param dataset dataset
+     */
+    protected final void setDataset(final DefaultXYDataset dataset) {
         chart.getXYPlot().setDataset(dataset);
     }
 
-    protected void setTitle(final AbstractTest test) {
+    /**
+     * Set the title of the chart based on the specified statistical test.
+     *
+     * @param test statistical test
+     */
+    protected final void setTitle(final AbstractTest test) {
         // Title line 1
         final int confidence = (int) (test.getConfidence() * 100);
         final String title1 = confidence + "% confidence";
@@ -144,23 +175,48 @@ public abstract class AbstractGraph {
         chart.setTitle(new TextTitle(title, Constants.CHART_FONT));
     }
 
-    protected void setXAxisLabel(final String label) {
+    /**
+     * Set the X axis label.
+     *
+     * @param label label text
+     */
+    protected final void setXAxisLabel(final String label) {
         chart.getXYPlot().getDomainAxis().setLabel(label);
     }
 
-    protected void setYAxisLabel(final String label) {
+    /**
+     * Set the Y axis label.
+     *
+     * @param label label text
+     */
+    protected final void setYAxisLabel(final String label) {
         chart.getXYPlot().getRangeAxis().setLabel(label);
     }
 
     // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
-    public JFreeChart getChart() {
+
+    /**
+     * Return the underlying chart object.
+     *
+     * @return chart object
+     */
+    public final JFreeChart getChart() {
         return chart;
     }
-    public ChartPanel getChartPanel() {
+
+    /**
+     * Return the underlying chart panel.
+     *
+     * @return chart panel object
+     */
+    public final ChartPanel getChartPanel() {
         return chartPanel;
     }
 
+    /**
+     * Refresh this AbstractGraph.
+     */
     public abstract void refresh();
 }
