@@ -2,6 +2,7 @@ package edu.missouristate.mote;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Insets;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -65,10 +66,25 @@ public final class Constants {
     // *************************************************************************
 
     /** Data grid min height. */
-    public static final int GRID_MIN_HEIGHT = 541;
+    public static final int GRID_MIN_HEIGHT = 600;
 
     /** Data grid min width. */
-    public static final int GRID_MIN_WIDTH = 300;
+    public static final int GRID_MIN_WIDTH = 320;
+
+    /** Property grid column names. */
+    public static final String[] GRID_COL_NAMES = new String[]{"Name", "Value"};
+
+    /** Percent of the property grid's width taken up by the name column. */
+    public static final double GRID_NAME_PCT = 0.6;
+
+    /** Insets for the cells in the property grid. */
+    public static final Insets CELL_INSETS = new Insets(1, 5, 1, 1);
+    
+    /** Height of the cells in the property grid. */
+    public static final int CELL_HEIGHT = 20;
+
+    /** Property grid help area min height. */
+    public static final int HELP_MIN_HEIGHT = 110;
 
     /** Decimal format for property grid numbers. */
     public static final String DECIMAL_FORMAT = "#,##0.0######";
@@ -78,10 +94,10 @@ public final class Constants {
             UIManager.getColor("TextField.background");
 
     /** Default graph height. */
-    public static final int GRAPH_HEIGHT = 517;
+    public static final int GRAPH_HEIGHT = 550;
 
     /** Default graph width. */
-    public static final int GRAPH_WIDTH = 630;
+    public static final int GRAPH_WIDTH = 680;
 
     /** Graph gridline color. */
     public static final Color GRAPH_GRID_COLOR =

@@ -1,6 +1,5 @@
 package edu.missouristate.mote.propertygrid;
 
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -12,51 +11,49 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import edu.missouristate.mote.events.ChangeListener;
 import edu.missouristate.mote.events.ChangeNotifier;
+import edu.missouristate.mote.Constants;
 
 /**
- *
- * @author tim
+ * Table component of the property grid.
  */
-public class PropertyTable extends JTable {
-
-    // *************************************************************************
-    // CONSTANTS
-    // *************************************************************************
-    // Column names
-    private static final String[] COL_NAMES = new String[]{"Name", "Value"};
-        private static final double NAME_WIDTH_PCT = 0.5;
+public final class PropertyTable extends JTable {
 
     // *************************************************************************
     // FIELDS
     // *************************************************************************
-    // Selected object backing the model
+
+    /** Selected object backing the model. */
     private ChangeNotifier selectedObject;
-    // Data for each row in the table
-    private final List<PropertyTableRow> tableRows;
+
+    /** Data for each row in the table. */
+    private final transient List<PropertyTableRow> tableRows;
 
     // *************************************************************************
     // CONSTRUCTORS
     // *************************************************************************
+
     /**
      * Initialize a new instance of a PropertyTable.
      */
     public PropertyTable() {
         super();
-        tableRows = new ArrayList<PropertyTableRow>();
+        tableRows = new ArrayList<>();
         // Setup an empty model
         final Object[][] data = new Object[][]{{null, null}};
-        this.setModel(new DefaultTableModel(data, COL_NAMES));
+        this.setModel(new DefaultTableModel(data, Constants.GRID_COL_NAMES));
         // General settings
         this.setCellSelectionEnabled(true);
         this.setEditingColumn(1);
         this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.setGridColor(new Color(204, 204, 204));
+        this.setGridColor(Constants.GRAPH_GRID_COLOR);
         this.setShowGrid(true);
+        this.setRowHeight(Constants.CELL_HEIGHT);
     }
 
     // *************************************************************************
     // PRIVATE METHODS
     // *************************************************************************
+
     /**
      * Return the row number for the next non-category row searching either
      * forwards or backwards through the table. If no non-category row can be
@@ -84,17 +81,19 @@ public class PropertyTable extends JTable {
         }
         return isFound ? currentRow : getSelectedRow();
     }
-    
+
+    /**
+     * Resize the columns in this table.
+     */
     private void resizeColumns() {
-        final int nameWidth = (int)(this.getWidth() * NAME_WIDTH_PCT);
-        //final int valueWidth = this.getWidth() - nameWidth;
+        final int nameWidth = (int) (this.getWidth() * Constants.GRID_NAME_PCT);
         this.getColumnModel().getColumn(0).setPreferredWidth(nameWidth);
-        //this.getColumnModel().getColumn(1).setPreferredWidth(valueWidth);
     }
 
     // *************************************************************************
     // PROTECTED METHODS
     // *************************************************************************
+
     /**
      * Handle key events, only allowing certain cells to be selected.
      *
@@ -103,29 +102,28 @@ public class PropertyTable extends JTable {
     @Override
     protected void processKeyEvent(final KeyEvent e) {
         final int code = e.getKeyCode();
-        // Let anything other than key presses pass through
         if (e.getID() != KeyEvent.KEY_PRESSED) {
+        // Let anything other than key presses pass through
             super.processKeyEvent(e);
-        } 
-        // Ignore the left/right arrow keys
-        else if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_RIGHT) {
+        } else if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_RIGHT) {
+            // Ignore the left/right arrow keys
             e.consume();
-        } // Move backward
-        else if (code == KeyEvent.VK_UP
+        } else if (code == KeyEvent.VK_UP
                 || (code == KeyEvent.VK_ENTER && e.isShiftDown())
                 || (code == KeyEvent.VK_TAB && e.isShiftDown())) {
+            // Move backward
             final int newRow = getNextRow(false);
             super.processKeyEvent(e);
             this.changeSelection(newRow, 1, false, false);
-        } // Move forward
-        else if (code == KeyEvent.VK_DOWN
+        }  else if (code == KeyEvent.VK_DOWN
                 || (code == KeyEvent.VK_ENTER && !e.isShiftDown())
                 || (code == KeyEvent.VK_TAB && !e.isShiftDown())) {
+            // Move forward
             final int newRow = getNextRow(true);
             super.processKeyEvent(e);
             this.changeSelection(newRow, 1, false, false);
-        } // Normal processing
-        else {
+        } else {
+            // Normal processing
             super.processKeyEvent(e);
         }
     }
@@ -140,24 +138,14 @@ public class PropertyTable extends JTable {
         final int row = this.rowAtPoint(e.getPoint());
         final int col = this.columnAtPoint(e.getPoint());
         boolean ignore = false;
-        
-        // I think I need to stop all cell editing here ...
-        //
-        //if (e.getClickCount() > 0 && col == 1 && this.getCellEditor() != null) {
-        //    final PropertyCellEditor editor = (PropertyCellEditor)this.getCellEditor();
-        //    if (editor.getRow() != row) {
-        //        editor.stopCellEditing();
-        //    }
-        //}
-        
-        // Only care about clicks
         if (e.getClickCount() == 0) {
-            ignore = false;
-        } // Invalid rows/cols
-        else if (row < 0 || row >= tableRows.size() || col < 0 || col > 1) {
-            ignore = false;
-        } // Can't click on property name/category cells
-        else if (col == 0 || tableRows.get(row).isCategory()) {
+            // Only care about clicks
+            ignore = true;
+        } else if (row < 0 || row >= tableRows.size() || col < 0 || col > 1) {
+            // Invalid rows/cols
+            ignore = true;
+        } else if (col == 0 || tableRows.get(row).isCategory()) {
+            // Can't click on property name/category cells
             ignore = true;
         }
         if (ignore) {
@@ -170,6 +158,7 @@ public class PropertyTable extends JTable {
     // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
+
     /**
      * Return the description for the current selection.
      *
@@ -232,9 +221,7 @@ public class PropertyTable extends JTable {
                     final Double value = (Double) getter.invoke(selectedObject);
                     this.setValueAt(value.toString(), row, 1);
                 }
-            } catch (IllegalAccessException ex) {
-                this.setValueAt("", row, 1);
-            } catch (InvocationTargetException ex) {
+            } catch (IllegalAccessException | InvocationTargetException ex) {
                 this.setValueAt("", row, 1);
             }
         }
@@ -259,18 +246,17 @@ public class PropertyTable extends JTable {
                 if (getter != null) {
                     data[index][1] = getter.invoke(object);
                 }
-            } catch (IllegalAccessException ex) {
-                data[index][1] = "";
-            } catch (InvocationTargetException ex) {
+            } catch (IllegalAccessException | InvocationTargetException ex) {
                 data[index][1] = "";
             }
         }
-        this.setModel(new DefaultTableModel(data, COL_NAMES));
+        this.setModel(new DefaultTableModel(data, Constants.GRID_COL_NAMES));
         resizeColumns();
         // Add custom renderers for each column and an editor for the values
         final PropertyCellEditor editor = new PropertyCellEditor(selectedObject,
                 tableRows);
-        final PropertyCellRenderer renderer = new PropertyCellRenderer(tableRows);
+        final PropertyCellRenderer renderer = new PropertyCellRenderer(
+                tableRows);
         this.getColumnModel().getColumn(0).setCellRenderer(renderer);
         this.getColumnModel().getColumn(1).setCellRenderer(renderer);
         this.getColumnModel().getColumn(1).setCellEditor(editor);
@@ -280,6 +266,7 @@ public class PropertyTable extends JTable {
         this.changeSelection(row, 1, false, false);
         // Listen to change events on the underlying object
         selectedObject.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged() {
                 refresh();
             }

@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.Map;
 
 /**
  * Provide a method for loading an object into a collection of PropertyGridRow
@@ -15,6 +16,7 @@ public final class ObjectLoader {
     // *************************************************************************
     // CONSTRUCTOR
     // *************************************************************************
+
     /**
      * Initialize a new instance of an ObjectLoader.
      */
@@ -24,6 +26,7 @@ public final class ObjectLoader {
     // *************************************************************************
     // PRIVATE METHODS
     // *************************************************************************
+
     /**
      * Return a mapping of {base name: category name} for all getters with
      * category annotations.
@@ -31,9 +34,9 @@ public final class ObjectLoader {
      * @param object object to examine
      * @return mapping of base name to category names
      */
-    private static HashMap<String, String> getCategories(final Object object) {
+    private static Map<String, String> getCategories(final Object object) {
 
-        final HashMap<String, String> result = new HashMap<String, String>();
+        final HashMap<String, String> result = new HashMap<>();
         final Method[] methods = object.getClass().getMethods();
         for (Method method : methods) {
             final String key = method.getName().substring(3);
@@ -58,7 +61,7 @@ public final class ObjectLoader {
     private static ArrayList<String> getMethodOrder(final Object object) {
         // Use a tree to order since we do not know how many methods we will be
         // retrieving via reflection or what order they will be retrieved in
-        final TreeMap<Integer, String> ordered = new TreeMap<Integer, String>();
+        final TreeMap<Integer, String> ordered = new TreeMap<>();
         final Method[] methods = object.getClass().getMethods();
         for (Method method : methods) {
             final String key = method.getName().substring(3);
@@ -72,7 +75,7 @@ public final class ObjectLoader {
             }
         }
         // Convert the tree's values in a list and return
-        final ArrayList<String> result = new ArrayList<String>();
+        final ArrayList<String> result = new ArrayList<>();
         result.addAll(ordered.values());
         return result;
     }
@@ -87,7 +90,7 @@ public final class ObjectLoader {
      */
     private static HashMap<String, Method[]> getMethodPairs(
             final Object object) {
-        final HashMap<String, Method[]> result = new HashMap<String, Method[]>();
+        final HashMap<String, Method[]> result = new HashMap<>();
         final Method[] methods = object.getClass().getMethods();
         for (Method method : methods) {
             final String key = method.getName().substring(3);
@@ -112,11 +115,9 @@ public final class ObjectLoader {
     private static boolean isGetter(final Method method) {
         if (!method.getName().startsWith("get")) {
             return false;
-        }
-        if (method.getParameterTypes().length != 0) {
+        } else if (method.getParameterTypes().length != 0) {
             return false;
-        }
-        if (void.class.equals(method.getReturnType())) {
+        } else if (void.class.equals(method.getReturnType())) {
             return false;
         }
         return true;
@@ -131,8 +132,7 @@ public final class ObjectLoader {
     private static boolean isSetter(final Method method) {
         if (!method.getName().startsWith("set")) {
             return false;
-        }
-        if (method.getParameterTypes().length != 1) {
+        } else if (method.getParameterTypes().length != 1) {
             return false;
         }
         return true;
@@ -149,8 +149,8 @@ public final class ObjectLoader {
      */
     public static ArrayList<PropertyTableRow> getRows(final Object object) {
 
-        final ArrayList<PropertyTableRow> result = new ArrayList<PropertyTableRow>();
-        final HashMap<String, String> categories = getCategories(object);
+        final ArrayList<PropertyTableRow> result = new ArrayList<>();
+        final Map<String, String> categories = getCategories(object);
         final ArrayList<String> methodOrder = getMethodOrder(object);
         final HashMap<String, Method[]> pairs = getMethodPairs(object);
         String currentCategory = "";

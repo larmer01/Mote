@@ -1,6 +1,5 @@
 package edu.missouristate.mote.propertygrid;
 
-import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -14,30 +13,39 @@ import edu.missouristate.mote.events.ChangeNotifier;
 import edu.missouristate.mote.Constants;
 
 /**
- *
- * @author tim
+ * A limited .NET-like property grid for numerical data.
  */
-public class PropertyGrid extends JPanel {
+public final class PropertyGrid extends JPanel {
 
     // *************************************************************************
     // FIELDS
     // *************************************************************************
-    // TextArea holding the help text
-    private final JTextArea help = new JTextArea();
-    // ScrollPanel holding the help TextArea
-    private final JScrollPane helpScrollPane = new JScrollPane();
-    // Table holding the properties
-    private final PropertyTable table = new PropertyTable();
-    // ScrollPane holding the properties Table
-    private final JScrollPane tableScrollPane = new JScrollPane();
+
+    /** TextArea holding the help text. */
+    private final transient JTextArea help;
+
+    /** ScrollPanel holding the help TextArea. */
+    private final transient JScrollPane helpScrollPane;
+
+    /** Table holding the properties. */
+    private final transient PropertyTable table;
+
+    /** ScrollPane holding the properties Table. */
+    private final transient JScrollPane tableScrollPane;
 
     // *************************************************************************
     // CONSTRUCTORS
     // *************************************************************************
+
     /**
      * Initialize a new instance of a PropertiesGrid.
      */
     public PropertyGrid() {
+        super();
+        help = new JTextArea();
+        helpScrollPane = new JScrollPane();
+        table = new PropertyTable();
+        tableScrollPane = new JScrollPane();
         initTable();
         initHelp();
         initLayout();
@@ -47,18 +55,18 @@ public class PropertyGrid extends JPanel {
     // *************************************************************************
     // PRIVATE METHODS
     // *************************************************************************
+
     /**
      * Initialize the help area.
      */
     private void initHelp() {
         help.setEditable(false);
         help.setBackground(Constants.NAME_BG_COLOR);
-        help.setColumns(20);
         help.setLineWrap(true);
-        help.setRows(5);
         help.setWrapStyleWord(true);
         help.setAutoscrolls(false);
-        help.setBorder(BorderFactory.createLineBorder(new Color(142, 142, 142), 0));
+        help.setBorder(BorderFactory.createLineBorder(
+                Constants.GRAPH_GRID_COLOR, 0));
         help.setDragEnabled(false);
         help.setFocusTraversalKeysEnabled(false);
         helpScrollPane.setViewportView(help);
@@ -68,19 +76,24 @@ public class PropertyGrid extends JPanel {
      * Initialize the panel layout.
      */
     private void initLayout() {
-        setBackground(new java.awt.Color(255, 255, 255));
+        setBackground(Constants.FORM_BG_COLOR);
         final GroupLayout mainLayout = new GroupLayout(this);
         this.setLayout(mainLayout);
         mainLayout.setHorizontalGroup(
                 mainLayout.createParallelGroup(GroupLayout.LEADING)
-                .add(tableScrollPane, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .add(helpScrollPane, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE));
+                .add(tableScrollPane, GroupLayout.PREFERRED_SIZE, 0,
+                        Short.MAX_VALUE)
+                .add(helpScrollPane, GroupLayout.DEFAULT_SIZE,
+                        Constants.GRID_MIN_WIDTH, Short.MAX_VALUE));
         mainLayout.setVerticalGroup(
                 mainLayout.createParallelGroup(GroupLayout.LEADING)
                 .add(mainLayout.createSequentialGroup()
-                .add(tableScrollPane, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                .add(tableScrollPane, GroupLayout.DEFAULT_SIZE,
+                        Constants.GRID_MIN_WIDTH, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.RELATED)
-                .add(helpScrollPane, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)));
+                .add(helpScrollPane, GroupLayout.PREFERRED_SIZE,
+                        Constants.HELP_MIN_HEIGHT,
+                        GroupLayout.PREFERRED_SIZE)));
     }
 
     /**
@@ -90,7 +103,8 @@ public class PropertyGrid extends JPanel {
         tableScrollPane.setViewportView(table);
         // Make sure we're notifyed when the selection changes
         final ListSelectionModel rowSelMod = table.getSelectionModel();
-        rowSelMod.addListSelectionListener(new PropertyGrid.SelectionListener());
+        rowSelMod.addListSelectionListener(
+                new PropertyGrid.SelectionListener());
     }
 
     // *************************************************************************
@@ -124,13 +138,14 @@ public class PropertyGrid extends JPanel {
     // *************************************************************************
     // INNER CLASSES
     // *************************************************************************
+
     /**
      * Handle changes to the selection.
      */
     private class SelectionListener implements ListSelectionListener {
 
         @Override
-        public void valueChanged(final ListSelectionEvent le) {
+        public void valueChanged(final ListSelectionEvent event) {
             help.setText(table.getDescription());
         }
     }

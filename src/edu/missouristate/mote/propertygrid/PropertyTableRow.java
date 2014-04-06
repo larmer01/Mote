@@ -6,27 +6,34 @@ import java.lang.reflect.Method;
  * Encapsulate a row in a PropertyGrid/PropertyTable and contains the references
  * to the underlying object holding the values for the row.
  */
-public class PropertyTableRow {
+public final class PropertyTableRow {
 
     // *************************************************************************
     // FIELDS
     // *************************************************************************
-    // Category name
+
+    /** Category name. */
     private String category;
-    // Description of the property as it will appear in the help area
+
+    /** Description of the property as it will appear in the help area. */
     private String description;
-    // Getter method for the property value
+
+    /** Getter method for the property value. */
     private Method getter;
-    // Name of the property as it will appear in column 0 of the grid
+
+    /** Name of the property as it will appear in column 0 of the grid. */
     private String name;
-    // True if the property is read-only; false, otherwise
+
+    /** True if the property is read-only; false, otherwise. */
     private boolean readonly;
-    // Setter method for the property value
+
+    /** Setter method for the property value. */
     private Method setter;
 
     // *************************************************************************
     // CONSTRUCTORS
     // *************************************************************************
+
     /**
      * Initialize a new instance of a PropertyGridRow.
      */
@@ -40,6 +47,7 @@ public class PropertyTableRow {
     // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
+
     /**
      * Return the category name.
      *
@@ -156,9 +164,6 @@ public class PropertyTableRow {
      * @return true if this row is a category row; false, otherwise
      */
     public boolean isCategory() {
-        if (name == null) {
-            return false;
-        }
-        return name.equals(category);
+        return name == null ? false : name.equals(category);
     }
 }

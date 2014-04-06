@@ -13,6 +13,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface IndexAnnotation {
-
-    public int value();
+    /**
+     * Get the value of the annotation.
+     * @return annotation value
+     */
+    int value();
 }

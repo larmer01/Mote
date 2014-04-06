@@ -12,6 +12,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface NameAnnotation {
-
-    public String value();
+    /**
+     * Get the value of the annotation.
+     * @return annotation value
+     */
+    String value();
 }

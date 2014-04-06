@@ -1,7 +1,6 @@
 package edu.missouristate.mote.propertygrid;
 
 import java.awt.Component;
-import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -13,20 +12,30 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellEditor;
 import edu.missouristate.mote.Constants;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Editor for cells in a PropertyTable.
  */
-public class PropertyCellEditor extends AbstractCellEditor
+public final class PropertyCellEditor extends AbstractCellEditor
         implements TableCellEditor {
 
     // *************************************************************************
     // FIELDS
     // *************************************************************************
+
+    /** Currently selected row. */
     private transient int currentRow;
-    private transient final Object selectedObject;
-    private transient final List<PropertyTableRow> tableRows;
-    private transient final JFormattedTextField textField;
+
+    /** Selected object backing the table model. */
+    private final transient Object selectedObject;
+
+    /** Table row data. */
+    private final transient List<PropertyTableRow> tableRows;
+
+    /** Text field backing this cell. */
+    private final transient JFormattedTextField textField;
 
     // *************************************************************************
     // CONSTRUCTORS
@@ -34,22 +43,22 @@ public class PropertyCellEditor extends AbstractCellEditor
     /**
      * Initialize a new instance of a PropertyCellEditor.
      *
-     * @param selectedObject selected object backing the model
-     * @param tableRows data for each row in the table
+     * @param object selected object backing the model
+     * @param rows data for each row in the table
      */
-    public PropertyCellEditor(final Object selectedObject,
-            final List<PropertyTableRow> tableRows) {
+    public PropertyCellEditor(final Object object,
+            final List<PropertyTableRow> rows) {
         super();
         // Initialize our fields
         currentRow = 0;
-        this.selectedObject = selectedObject;
-        this.tableRows = tableRows;
+        selectedObject = object;
+        tableRows = rows;
         textField = new JFormattedTextField();
-        // The default border makes it almost impossible to edit
-        textField.setBorder(new EmptyBorder(new Insets(1, 5, 1, 1)));
+        textField.setBorder(new EmptyBorder(Constants.CELL_INSETS));
         // This handles getting us out of editing using tab or enter if we
         // used the mouse to double click and edit the cell
         textField.addKeyListener(new KeyAdapter() {
+            @Override
             public void keyPressed(final KeyEvent evt) {
                 switch (evt.getKeyCode()) {
                     case KeyEvent.VK_ESCAPE:
@@ -60,14 +69,50 @@ public class PropertyCellEditor extends AbstractCellEditor
                     case KeyEvent.VK_UP:
                     case KeyEvent.VK_DOWN:
                         stopCellEditing();
+                    default:
+                        break;
                 }
             }
         });
     }
 
     // *************************************************************************
+    // PRIVATE METHODS
+    // *************************************************************************
+
+    /**
+     * Update the value of the backing text field and underlying object.
+     *
+     * @param oldValue original value in the field
+     * @param newValue new value for the field
+     * @param getter underlying object's getter method
+     * @param setter underlying object's setter method
+     */
+    private void updateValue(final double oldValue, final double newValue,
+            final Method getter, final Method setter) {
+        // Numbers are the same, don't update
+        if (Math.abs(newValue - oldValue) < Constants.PRECISION) {
+            return;
+        }
+        try {
+            // Update the underlying object
+            setter.invoke(selectedObject, newValue);
+            // It's possible the object has some restrictions on values and
+            // rejected our change (or altered it); retrieve the current value
+            // from the underlying object
+            final Double value = (Double) getter.invoke(selectedObject);
+            textField.setText(value.toString());
+        } catch (IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException ex) {
+            Logger.getLogger(PropertyCellEditor.class.getName()).log(Level.INFO,
+                    null, ex);
+        }
+    }
+
+    // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
+
     /**
      * Return the value contained in the editor.
      *
@@ -76,10 +121,6 @@ public class PropertyCellEditor extends AbstractCellEditor
     @Override
     public Object getCellEditorValue() {
         return textField.getText();
-    }
-    
-    public int getRow() {
-        return currentRow;
     }
 
     /**
@@ -123,31 +164,30 @@ public class PropertyCellEditor extends AbstractCellEditor
         if (getter == null || setter == null) {
             return super.stopCellEditing();
         }
-        // Get the new value
+        // Get the current (pre-editing) value from the object
+        final Double oldValue;
+        try {
+            oldValue = (Double) getter.invoke(selectedObject);
+        } catch (IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException ex) {
+            Logger.getLogger(PropertyCellEditor.class.getName()).log(Level.INFO,
+                    null, ex);
+            return super.stopCellEditing();
+        }
+        // Get the new (edited) value from the text field
+        boolean useOldValue = false;
         double newValue;
-        boolean newIsValid = true;
         try {
             newValue = Double.parseDouble(textField.getText());
-        } catch (ClassCastException e) {
+        } catch (NumberFormatException ex) {
             newValue = 0.0;
-            newIsValid = false;
-        } catch (NumberFormatException e) {
-            newValue = 0.0;
-            newIsValid = false;
+            useOldValue = true;
         }
-        try {
-            final double oldValue = (Double) getter.invoke(selectedObject);
-            // Update the underlying object if the new value is a valid number
-            if (newIsValid && Math.abs(newValue - oldValue) > Constants.PRECISION) {
-                setter.invoke(selectedObject, newValue);
-            }
-            // It's possible the object has some restrictions on values and
-            // rejected our change (or altered it); retrieve the current
-            // value from the underlying object
-            final Double value = (Double) getter.invoke(selectedObject);
-            textField.setText(value.toString());
-        } catch (IllegalAccessException ex) {
-        } catch (InvocationTargetException ex) {
+        // Update
+        if (useOldValue) {
+            textField.setText(oldValue.toString());
+        } else {
+            updateValue(oldValue, newValue, getter, setter);
         }
         return super.stopCellEditing();
     }
