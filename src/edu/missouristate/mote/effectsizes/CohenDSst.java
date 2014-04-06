@@ -162,10 +162,10 @@ public final class CohenDSst extends AbstractNonCentralTest {
     public void reset() {
         fixedSD = true;
         useInputs = true;
-        setSampleSize(341);
-        setSampleMean(30);
-        setPopulationMean(29);
-        setSampleStdDev(1.5);
+        setSampleSize(0);
+        setSampleMean(0);
+        setPopulationMean(0);
+        setSampleStdDev(0);
         setConfidence(0.95);
     }
 

@@ -146,10 +146,10 @@ public final class Eta2FOmni extends AbstractNonCentralTest {
     @Override
     public void reset() {
         useInputs = true;
-        setSsEffect(10);
-        setSsTotal(27.4885);
-        setDfEffect(5);
-        setDfError(39);
+        setSsEffect(1);
+        setSsTotal(1);
+        setDfEffect(0);
+        setDfError(0);
         setConfidence(0.95);
     }
 
