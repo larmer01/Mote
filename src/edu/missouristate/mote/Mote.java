@@ -1,6 +1,22 @@
 package edu.missouristate.mote;
 
-import java.awt.Color;
+import edu.missouristate.mote.effectsizes.AbstractNonCentralTest;
+import edu.missouristate.mote.effectsizes.AbstractNormalTest;
+import edu.missouristate.mote.effectsizes.AbstractTest;
+import edu.missouristate.mote.effectsizes.CohenDDepTAvgs;
+import edu.missouristate.mote.effectsizes.CohenDDepTDiff;
+import edu.missouristate.mote.effectsizes.CohenDIndT;
+import edu.missouristate.mote.effectsizes.CohenDR;
+import edu.missouristate.mote.effectsizes.CohenDSst;
+import edu.missouristate.mote.effectsizes.CohenDZ;
+import edu.missouristate.mote.effectsizes.Eta2FOmni;
+import edu.missouristate.mote.effectsizes.GlassDIndT;
+import edu.missouristate.mote.effectsizes.HedgesGIndT;
+import edu.missouristate.mote.effectsizes.OddsRisk;
+import edu.missouristate.mote.effectsizes.Omega2FOmni;
+import edu.missouristate.mote.effectsizes.PEta2FEff;
+import edu.missouristate.mote.effectsizes.POmega2FEff;
+import edu.missouristate.mote.effectsizes.RIntraCorrF;
 import java.awt.EventQueue;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -20,7 +36,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
-import edu.missouristate.mote.effectsizes.*;
 import edu.missouristate.mote.graph.GraphPanel;
 import edu.missouristate.mote.propertygrid.PropertyGrid;
 
@@ -29,11 +44,20 @@ import edu.missouristate.mote.propertygrid.PropertyGrid;
  */
 public final class Mote extends JFrame {
 
+    /** Set to true to enable testing/debugging features. */
+    private static final boolean ENABLE_TESTING = true;
+
     // *************************************************************************
     // PRIVATE FIELDS
     // *************************************************************************
-    private transient final PropertyGrid dataGrid;
-    private transient final GraphPanel graphPanel;
+
+    /** Data entry property grid. */
+    private final transient PropertyGrid dataGrid;
+
+    /** Charting and graphing panel. */
+    private final transient GraphPanel graphPanel;
+
+    /** Current statistical test. */
     private transient AbstractTest selectedTest;
 
     // *************************************************************************
@@ -46,11 +70,9 @@ public final class Mote extends JFrame {
         super();
         dataGrid = new PropertyGrid();
         graphPanel = new GraphPanel();
-        // Setup the form
         setupMenu();
         setupLayout();
-        // Our default test
-        updateTest(new CohenDZ());
+        updateTest(new CohenDZ());  // our default test
     }
 
     // *************************************************************************
@@ -103,12 +125,11 @@ public final class Mote extends JFrame {
         final JMenuItem result = new JMenuItem();
         result.setText(test.getMeasureName() + " - " + test.getTestName());
         final ActionListener listener = new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent evt) {
                 try {
                     updateTest(test.getClass().newInstance());
-                } catch (InstantiationException ex) {
-                    result.setEnabled(false);
-                } catch (IllegalAccessException ex) {
+                } catch (InstantiationException | IllegalAccessException ex) {
                     result.setEnabled(false);
                 }
             }
@@ -128,12 +149,11 @@ public final class Mote extends JFrame {
         final JMenuItem result = new JMenuItem();
         result.setText(test.getMeasureName() + " - " + test.getTestName());
         final ActionListener listener = new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent evt) {
                 try {
                     updateTest(test.getClass().newInstance());
-                } catch (InstantiationException ex) {
-                    result.setEnabled(false);
-                } catch (IllegalAccessException ex) {
+                } catch (InstantiationException | IllegalAccessException ex) {
                     result.setEnabled(false);
                 }
             }
@@ -151,6 +171,7 @@ public final class Mote extends JFrame {
         final JMenu result = new JMenu();
         result.setText("Edit");
         result.add(createMenuItem("Reset Data", new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent evt) {
                 selectedTest.reset();
             }
@@ -175,21 +196,27 @@ public final class Mote extends JFrame {
         result.add(createMenuItem(new CohenDR()));
         result.add(createMenuItem(new HedgesGIndT()));
         result.add(createMenuItem(new GlassDIndT()));
-        // F Distribution
-        result.add(new Separator());
-        result.add(createDisabledMenuItem("R" + Constants.SUPERSCRIPT2 + " - F Test Omnibus"));
-        result.add(createDisabledMenuItem(Constants.DELTA_UPPER + "R" + Constants.SUPERSCRIPT2 + " - F Test Change"));
-        result.add(createMenuItem(new Eta2FOmni()));
-        result.add(createMenuItem(new PEta2FEff()));
-        result.add(createMenuItem(new Omega2FOmni()));
-        result.add(createMenuItem(new POmega2FEff()));
-        result.add(createMenuItem(new RIntraCorrF()));
-        // Chi-Squared Distribution
-        result.add(new Separator());
-        result.add(createDisabledMenuItem(Constants.PHI_UPPER + " - " + Constants.CHI_LOWER + Constants.SUPERSCRIPT2));
-        // Odds/Risk
-        result.add(new Separator());
-        result.add(createMenuItem(new OddsRisk()));
+        if (ENABLE_TESTING) {
+            // F Distribution
+            result.add(new Separator());
+            result.add(createDisabledMenuItem("R" + Constants.SUPERSCRIPT2
+                    + " - F Test Omnibus"));
+            result.add(createDisabledMenuItem(Constants.DELTA_UPPER + "R"
+                    + Constants.SUPERSCRIPT2 + " - F Test Change"));
+            result.add(createMenuItem(new Eta2FOmni()));
+            result.add(createMenuItem(new PEta2FEff()));
+            result.add(createMenuItem(new Omega2FOmni()));
+            result.add(createMenuItem(new POmega2FEff()));
+            result.add(createMenuItem(new RIntraCorrF()));
+            // Chi-Squared Distribution
+            result.add(new Separator());
+            result.add(createDisabledMenuItem("Cram" + Constants.E_ACCENT_LOWER
+                    + "r's " + Constants.PHI_UPPER + " - " + Constants.CHI_LOWER
+                    + Constants.SUPERSCRIPT2));
+            // Odds/Risk
+            result.add(new Separator());
+            result.add(createMenuItem(new OddsRisk()));
+        }
         return result;
     }
 
@@ -198,11 +225,23 @@ public final class Mote extends JFrame {
      *
      * @return menu
      */
-    public JMenu createHelpMenu() {
+    private JMenu createHelpMenu() {
         final JMenu result = new JMenu();
         result.setText("Help");
-        result.add(createDisabledMenuItem("User's Guide"));
-        result.add(createDisabledMenuItem("About"));
+        result.add(createMenuItem("User's Guide", new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                DesktopHandler.openFile("/Guide.pdf");
+            }
+        }, null));
+        final Mote instance = this;
+        result.add(createMenuItem("About", new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                final AboutDialog dialog = new AboutDialog(instance);
+                dialog.setVisible(true);
+            }
+        }, null));
         return result;
     }
 
@@ -215,7 +254,7 @@ public final class Mote extends JFrame {
                 BorderFactory.createEtchedBorder(), "Data", TitledBorder.LEFT,
                 TitledBorder.TOP));
         // Graph panel
-        graphPanel.setBackground(new Color(255, 255, 255));
+        graphPanel.setBackground(Constants.GRAPH_BG_COLOR);
         graphPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(), "Confidence Interval",
                 TitledBorder.LEFT, TitledBorder.TOP));
@@ -223,14 +262,14 @@ public final class Mote extends JFrame {
         graphPanel.setLayout(graphPanelLayout);
         graphPanelLayout.setHorizontalGroup(
                 graphPanelLayout.createParallelGroup(GroupLayout.LEADING)
-                .add(0, 630, Short.MAX_VALUE));
+                .add(0, Constants.GRAPH_WIDTH, Short.MAX_VALUE));
         graphPanelLayout.setVerticalGroup(
                 graphPanelLayout.createParallelGroup(GroupLayout.LEADING)
-                .add(0, 517, Short.MAX_VALUE));
+                .add(0, Constants.GRAPH_HEIGHT, Short.MAX_VALUE));
         // Form
         setTitle("Mote");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setBackground(new Color(255, 255, 255));
+        setBackground(Constants.FORM_BG_COLOR);
         getContentPane().setBackground(getBackground());
         final GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -238,17 +277,22 @@ public final class Mote extends JFrame {
                 layout.createParallelGroup(GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataGrid, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+                .add(dataGrid, GroupLayout.PREFERRED_SIZE,
+                        Constants.GRID_MIN_WIDTH,
+                GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.RELATED)
-                .add(graphPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(graphPanel, GroupLayout.DEFAULT_SIZE,
+                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap()));
         layout.setVerticalGroup(
                 layout.createParallelGroup(GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(GroupLayout.BASELINE)
-                .add(dataGrid, GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
-                .add(graphPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(dataGrid, GroupLayout.DEFAULT_SIZE,
+                        Constants.GRID_MIN_HEIGHT, Short.MAX_VALUE)
+                .add(graphPanel, GroupLayout.DEFAULT_SIZE,
+                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap()));
         pack();
     }
@@ -305,27 +349,17 @@ public final class Mote extends JFrame {
      *
      * @param args command line arguments
      */
-    public static void main(final String args[]) {
-        // Set the Nimbus look and feel
+    public static void main(final String[] args) {
         try {
-            for (UIManager.LookAndFeelInfo info
-                    : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Mote.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(Mote.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(Mote.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException |
+                IllegalAccessException |
+                javax.swing.UnsupportedLookAndFeelException ex) {
             Logger.getLogger(Mote.class.getName()).log(Level.SEVERE, null, ex);
         }
         // Create and display the form
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new Mote().setVisible(true);
             }

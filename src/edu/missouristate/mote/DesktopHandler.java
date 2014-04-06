@@ -17,6 +17,13 @@ import java.util.logging.Logger;
 public final class DesktopHandler {
 
     // *************************************************************************
+    // PRIVATE CONSTANTS
+    // *************************************************************************
+
+    /** Number of bytes in the file read buffer. */
+    private static final int READ_BYTES = 4096;
+
+    // *************************************************************************
     // CONSTRUCTORS
     // *************************************************************************
     /**
@@ -68,7 +75,7 @@ public final class DesktopHandler {
             }
             // Copy
             int readBytes;
-            final byte[] buffer = new byte[4096];
+            final byte[] buffer = new byte[READ_BYTES];
             while ((readBytes = in.read(buffer)) > 0) {
                 out.write(buffer, 0, readBytes);
             }
@@ -85,8 +92,10 @@ public final class DesktopHandler {
      * @param filename file name
      */
     public static void openFile(final String filename) {
-        final Desktop desktop = Desktop.isDesktopSupported()
-                ? Desktop.getDesktop() : null;
+        if (!Desktop.isDesktopSupported()) {
+            return;
+        }
+        final Desktop desktop = Desktop.getDesktop();
         if (desktop != null && desktop.isSupported(Desktop.Action.OPEN)) {
             try {
                 final File file = extractFile(filename);
@@ -106,8 +115,10 @@ public final class DesktopHandler {
      * @param url URL as a string
      */
     public static void openWebPage(final String url) {
-        final Desktop desktop = Desktop.isDesktopSupported()
-                ? Desktop.getDesktop() : null;
+        if (!Desktop.isDesktopSupported()) {
+            return;
+        }
+        final Desktop desktop = Desktop.getDesktop();
         if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
             try {
                 desktop.browse(new URL(url).toURI());
