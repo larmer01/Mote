@@ -83,6 +83,10 @@ public final class Constants {
     /** Default graph width. */
     public static final int GRAPH_WIDTH = 630;
 
+    /** Graph gridline color. */
+    public static final Color GRAPH_GRID_COLOR =
+            UIManager.getColor("Table.gridColor");
+
     /** Background color for the form. */
     public static final Color FORM_BG_COLOR =
             UIManager.getColor("TextField.background");
