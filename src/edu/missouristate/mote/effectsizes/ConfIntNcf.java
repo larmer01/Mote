@@ -21,9 +21,11 @@ public final class ConfIntNcf {
     // *************************************************************************
     // PRIVATE METHODS
     // *************************************************************************
+
     /**
      * Find an initial value for the non-centrality parameter that is used to
-     * create a lower bound for the binary search.
+     * create a lower bound for the binary search. The lower the non-centrality
+     * parameter, the higher the cumulative probability.
      *
      * @param fValue F value
      * @param df1 numerator degrees of freedom
@@ -33,12 +35,12 @@ public final class ConfIntNcf {
      */
     private static double estimateLowerNc(final double fValue, final double df1,
             final double df2, final double target) {
-        double result = 1;
-        double actual = FDist.cdf(fValue, df1, df2, result);
+        double result = -1;
+        double prob = FDist.cdf(fValue, df1, df2, result);
         int count = 0;
-        while (actual < target && count < Constants.NC_MAX_ITER) {
-            result -= 0.1;
-            actual = FDist.cdf(fValue, df1, df2, result);
+        while (prob < target && count < Constants.NC_MAX_ITER) {
+            result *= 2;
+            prob = FDist.cdf(fValue, df1, df2, result);
             count++;
         }
         return result;
@@ -46,7 +48,8 @@ public final class ConfIntNcf {
 
     /**
      * Find an initial value for the non-centrality parameter that is used to
-     * create an upper bound for the binary search.
+     * create an upper bound for the binary search. The higher the
+     * non-centrality parameter, the lower the cumulative probability.
      *
      * @param fValue F value
      * @param df1 numerator degrees of freedom
@@ -56,12 +59,12 @@ public final class ConfIntNcf {
      */
     private static double estimateUpperNc(final double fValue, final double df1,
             final double df2, final double target) {
-        double result = 0.1;
-        double actual = FDist.cdf(fValue, df1, df2, result);
+        double result = 1;
+        double prob = FDist.cdf(fValue, df1, df2, result);
         int count = 0;
-        while (actual > target && count < Constants.NC_MAX_ITER) {
-            result += 1;
-            actual = FDist.cdf(fValue, df1, df2, result);
+        while (prob > target && count < Constants.NC_MAX_ITER) {
+            result *= 2;
+            prob = FDist.cdf(fValue, df1, df2, result);
             count++;
         }
         return result;
@@ -159,18 +162,19 @@ public final class ConfIntNcf {
         double lowerNc = estimateLowerNc(fValue, df1, df2, target);
         double upperNc = estimateUpperNc(fValue, df1, df2, target);
         double result = (lowerNc + upperNc) * 0.5;
-        double actual = FDist.cdf(fValue, df1, df2, result);
+        double prob = FDist.cdf(fValue, df1, df2, result);
         int count = 0;
-        while (Math.abs(actual - target) > Constants.PRECISION
-                && count < Constants.NC_MAX_ITER) {
-            if (actual < target) {
+        double error = Math.abs(prob - target);
+        while (error > Constants.PRECISION && count < Constants.NC_MAX_ITER) {
+            if (prob < target) {
                 upperNc = result;
-                result = (lowerNc + result) * 0.5;
+                result = (lowerNc + result) / 2;
             } else {
                 lowerNc = result;
-                result = (upperNc + result) * 0.5;
+                result = (upperNc + result) / 2;
             }
-            actual = FDist.cdf(fValue, df1, df2, result);
+            prob = FDist.cdf(fValue, df1, df2, result);
+            error = Math.abs(prob - target);
             count++;
         }
         return result;
