@@ -29,6 +29,7 @@ public final class TDist {
     // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
+
     /**
      * Calculate the cumulative density of the non-central t distribution.
      *
