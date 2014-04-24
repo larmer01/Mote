@@ -240,10 +240,10 @@ public class AboutDialog extends JDialog {
         subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         subtitleLabel.setText("Measure of the Effect");
 
-        if (Constants.VERSION < 1) {
+        if (Constants.VERSION.startsWith("0.")) {
             versionLabel.setText(Constants.VERSION + " (beta)");
         } else {
-            versionLabel.setText(String.valueOf(Constants.VERSION));
+            versionLabel.setText(Constants.VERSION);
         }
         versionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 

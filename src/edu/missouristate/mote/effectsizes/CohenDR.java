@@ -111,6 +111,29 @@ public final class CohenDR extends AbstractNonCentralTest {
     }
 
     // *************************************************************************
+    // PROTECTED STATIC METHODS
+    // *************************************************************************
+    /**
+     * Return the degrees of freedom given a sample size.
+     *
+     * @param size sample size
+     * @return degrees of freedom
+     */
+    protected static double calcDF(final double size) {
+        return size - 2;
+    }
+
+    /**
+     * Return the sample size given degrees of freedom.
+     *
+     * @param df degrees of freedom
+     * @return sample size
+     */
+    protected static double calcSize(final double df) {
+        return df + 2;
+    }
+    
+    // *************************************************************************
     // PUBLIC METHODS
     // *************************************************************************
     @Override
@@ -167,7 +190,7 @@ public final class CohenDR extends AbstractNonCentralTest {
     }
 
     public void setSize(final double value) {
-        size = Math.max(Constants.MIN_SS, value);
+        size = Math.max(Constants.MIN_SS + 1, value);
         df = calcDF(size);
         calculate();
     }

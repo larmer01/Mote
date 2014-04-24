@@ -16,7 +16,7 @@ public final class Constants {
     // *************************************************************************
 
     /** Program version. */
-    public static final double VERSION = 0.7;
+    public static final String VERSION = "0.7.1";
 
     // *************************************************************************
     // EFFECT SIZES
