@@ -241,10 +241,8 @@ public final class CohenDR extends AbstractNonCentralTest {
     @CategoryAnnotation(value = Constants.DERIVED_CATEGORY)
     @NameAnnotation(value = "t Statistic")
     @IndexAnnotation(value = 6)
-    @DescriptionAnnotation(value = "t statistic. If this value is entered, "
-            + "the sample mean, population mean, standard deviation, and "
-            + "standard error will clear to zero and Cohen's d will be "
-            + "calculated from the t statistic.")
+    @DescriptionAnnotation(value = "t statistic. This is derived from the, "
+            + "value of R-squared and the sample size.")
     @Override
     public double getTestStatistic() {
         return testStatistic;
