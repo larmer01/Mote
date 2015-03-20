@@ -102,8 +102,10 @@ public final class CohenDR extends AbstractNonCentralTest {
             return;
         }
         // Lower, upper Cohen's d
-        lowerMeasure = lowerNc / Math.sqrt(size);
-        upperMeasure = upperNc / Math.sqrt(size);
+        //lowerMeasure = lowerNc / Math.sqrt(size);
+        //upperMeasure = upperNc / Math.sqrt(size);
+        lowerMeasure = 2 * lowerNc / Math.sqrt(df);
+        upperMeasure = 2 * upperNc / Math.sqrt(df);
         // PDF curves
         lowerPdf = ConfIntNct.createPdf(testStatistic, df, lowerNc, lowerNc, upperNc);
         upperPdf = ConfIntNct.createPdf(testStatistic, df, upperNc, lowerNc, upperNc);
